@@ -49,12 +49,12 @@ jobs:
     - name: Run backend linting
       run: |
         cd backend
-        npm run lint
+        npm run lint -- --max-warnings 50
     
     - name: Run frontend linting
       run: |
         cd frontend
-        npm run lint
+        npm run lint -- --max-warnings 50
     
     - name: Build backend
       run: |

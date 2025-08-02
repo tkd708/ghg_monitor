@@ -37,7 +37,7 @@ router.get('/:siteId/data', authenticate, async (req, res): Promise<void> => {
     const files = await fs.readdir(dataPath)
     const csvFiles = files.filter(f => f.endsWith('.csv'))
 
-    let allData: any[] = []
+    const allData: any[] = []
 
     for (const file of csvFiles) {
       try {
@@ -431,7 +431,7 @@ router.get('/:siteId/flux-calculations', authenticate, async (req, res): Promise
     const files = await fs.readdir(dataPath)
     const csvFiles = files.filter(f => f.endsWith('.csv'))
 
-    let allFluxResults: FluxResult[] = []
+    const allFluxResults: FluxResult[] = []
 
     // Process each CSV file
     for (const file of csvFiles) {
@@ -542,7 +542,7 @@ router.get('/:siteId/filtered-flux', authenticate, async (req, res): Promise<voi
     const files = await fs.readdir(dataPath)
     const csvFiles = files.filter(f => f.endsWith('.csv'))
 
-    let allFluxResults: FluxResult[] = []
+    const allFluxResults: FluxResult[] = []
 
     // Process each CSV file
     for (const file of csvFiles) {
@@ -983,7 +983,7 @@ router.get('/:siteId/daily-cumulative-flux', authenticate, async (req, res): Pro
     const files = await fs.readdir(dataPath)
     const csvFiles = files.filter(f => f.endsWith('.csv'))
 
-    let allFluxResults: FluxResult[] = []
+    const allFluxResults: FluxResult[] = []
 
     // Process each CSV file
     for (const file of csvFiles) {
