@@ -1,0 +1,32 @@
+{
+  "sites": [
+    {
+      "id": "qut-cotton2",
+      "name": "QUT Cotton Trial 2",
+      "description": "Cotton field trial with N2O emission measurements",
+      "location": {
+        "latitude": -27.5598,
+        "longitude": 153.0813,
+        "region": "Queensland",
+        "country": "Australia"
+      },
+      "timezone": "Australia/Brisbane",
+      "chambers": 16,
+      "dataPath": "data/flux_data_test",
+      "active": true,
+      "treatments": [
+        { "name": "N0", "description": "Control (0 kg N/ha)", "chambers": [1, 5, 9, 13] },
+        { "name": "N200", "description": "Standard N (200 kg N/ha)", "chambers": [3, 7, 11, 15] },
+        { "name": "eNPower", "description": "Enhanced efficiency fertilizer", "chambers": [2, 6, 10, 14] },
+        { "name": "Centuro", "description": "Nitrification inhibitor", "chambers": [4, 8, 12, 16] }
+      ],
+      "qualityThresholds": {
+        "co2_r2_min": 0.6,
+        "n2o_r2_min": 0.6,
+        "n2o_flux_min": -5
+      }
+    }
+  ],
+  "version": "1.0.0",
+  "lastUpdated": "2025-08-02T00:00:00Z"
+}
