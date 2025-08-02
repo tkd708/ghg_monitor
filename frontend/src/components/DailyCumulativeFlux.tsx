@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Calendar, Settings, BarChart3, TrendingUp } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ErrorBar } from 'recharts'
 import { Site } from '@/types'
+import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface QualityControlCriteria {
   co2_r2_min: number

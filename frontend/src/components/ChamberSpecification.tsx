@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Settings, Save, Plus, Trash2, Calculator } from 'lucide-react'
 import { Site } from '@/types'
+import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface ChamberSpec {
   chamber: number

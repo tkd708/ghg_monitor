@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { AlertCircle, BarChart3, TrendingUp, Activity } from 'lucide-react'
 import { useSite } from '@/context/SiteContext'
+import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 export default function Dashboard() {
   const { siteId } = useParams<{ siteId: string }>()
@@ -10,10 +11,8 @@ export default function Dashboard() {
   const { data: fluxData, isLoading, error } = useQuery({
     queryKey: ['fluxData', siteId],
     queryFn: async () => {
-      const response = await fetch(`/api/sites/${siteId}/data`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
+      const response = await fetch(buildApiUrl(`api/sites/${siteId}/data`), {
+        headers: getAuthHeaders(),
       })
       if (!response.ok) throw new Error('Failed to fetch flux data')
       return response.json()

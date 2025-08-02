@@ -8,6 +8,7 @@ import IndividualFluxViewer from '@/components/IndividualFluxViewer'
 import FluxQualityCheck from '@/components/FluxQualityCheck'
 import SubdailyFluxDynamics from '@/components/SubdailyFluxDynamics'
 import DailyCumulativeFlux from '@/components/DailyCumulativeFlux'
+import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface QualityControlCriteria {
   co2_r2_min: number

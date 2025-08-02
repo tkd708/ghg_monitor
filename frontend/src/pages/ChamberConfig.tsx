@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Save, Plus, Settings, AlertCircle, Download, FileText } from 'lucide-react'
 import { ChamberConfig, Site } from '@/types'
 import { useSite } from '@/context/SiteContext'
+import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 export default function ChamberConfigPage() {
   const { siteId } = useParams<{ siteId: string }>()

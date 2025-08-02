@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { FileText, AlertCircle, TrendingUp, BarChart3, Calculator } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, ReferenceLine, Cell } from 'recharts'
 import { Site } from '@/types'
+import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface DataFile {
   filename: string

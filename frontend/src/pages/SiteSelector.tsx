@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { MapPin, Activity, AlertCircle } from 'lucide-react'
 import { Site } from '@/types'
 import { useSite } from '@/context/SiteContext'
+import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 export default function SiteSelector() {
   const navigate = useNavigate()

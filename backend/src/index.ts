@@ -29,6 +29,10 @@ app.use('/api/sites', dataRoutes)
 app.use('/api/sites', photosRoutes)
 
 // Health check
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
