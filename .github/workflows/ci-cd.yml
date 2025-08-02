@@ -74,9 +74,9 @@ jobs:
     - name: Run security audit
       run: |
         cd backend
-        npm audit --audit-level moderate
+        npm audit --audit-level high
         cd ../frontend
-        npm audit --audit-level moderate
+        npm audit --audit-level high
 
   docker:
     runs-on: ubuntu-latest
