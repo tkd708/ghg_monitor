@@ -80,6 +80,12 @@ npm run dev
 
 3. Access the application at `http://localhost:5173`
 
+### Login Credentials
+
+- **Password:** `ghgmonitor`
+
+The application uses simple password authentication. Enter `ghgmonitor` when prompted to log in.
+
 ## Data Structure
 
 The application expects GHG flux data in CSV format with the following columns:

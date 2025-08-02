@@ -18,7 +18,7 @@ router.post('/verify', async (req, res): Promise<void> => {
     // In production, store hashed password in environment variable
     const validPassword = await bcrypt.compare(
       password,
-      process.env.HASHED_PASSWORD || '$2a$10$X4kv7j5ZcG39WgogSl16au7eW1eH4pgV4JQHr6A9bAaQ6zZ6sDrsC' // default: "ghgmonitor"
+      process.env.HASHED_PASSWORD || '$2a$10$Pny65Gtf5HLXgFlur0uZZO82m.iFL4So.LgDw9yWJGSZLYutroM9i' // default: "ghgmonitor"
     )
 
     if (!validPassword) {
