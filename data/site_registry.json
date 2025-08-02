@@ -20,6 +20,24 @@
         { "name": "eNPower", "description": "Enhanced efficiency fertilizer", "chambers": [2, 6, 10, 14] },
         { "name": "Centuro", "description": "Nitrification inhibitor", "chambers": [4, 8, 12, 16] }
       ],
+      "chamberConfigs": [
+        { "chamber": 1, "treatment": "N0", "replicate": 1, "description": "Control plot 1" },
+        { "chamber": 2, "treatment": "eNPower", "replicate": 1, "description": "Enhanced efficiency fertilizer 1" },
+        { "chamber": 3, "treatment": "N200", "replicate": 1, "description": "Standard N fertilizer 1" },
+        { "chamber": 4, "treatment": "Centuro", "replicate": 1, "description": "Nitrification inhibitor 1" },
+        { "chamber": 5, "treatment": "N0", "replicate": 2, "description": "Control plot 2" },
+        { "chamber": 6, "treatment": "eNPower", "replicate": 2, "description": "Enhanced efficiency fertilizer 2" },
+        { "chamber": 7, "treatment": "N200", "replicate": 2, "description": "Standard N fertilizer 2" },
+        { "chamber": 8, "treatment": "Centuro", "replicate": 2, "description": "Nitrification inhibitor 2" },
+        { "chamber": 9, "treatment": "N0", "replicate": 3, "description": "Control plot 3" },
+        { "chamber": 10, "treatment": "eNPower", "replicate": 3, "description": "Enhanced efficiency fertilizer 3" },
+        { "chamber": 11, "treatment": "N200", "replicate": 3, "description": "Standard N fertilizer 3" },
+        { "chamber": 12, "treatment": "Centuro", "replicate": 3, "description": "Nitrification inhibitor 3" },
+        { "chamber": 13, "treatment": "N0", "replicate": 4, "description": "Control plot 4" },
+        { "chamber": 14, "treatment": "eNPower", "replicate": 4, "description": "Enhanced efficiency fertilizer 4" },
+        { "chamber": 15, "treatment": "N200", "replicate": 4, "description": "Standard N fertilizer 4" },
+        { "chamber": 16, "treatment": "Centuro", "replicate": 4, "description": "Nitrification inhibitor 4" }
+      ],
       "qualityThresholds": {
         "co2_r2_min": 0.6,
         "n2o_r2_min": 0.6,

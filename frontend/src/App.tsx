@@ -5,6 +5,7 @@ import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import SiteSelector from './pages/SiteSelector'
 import Photos from './pages/Photos'
+import ChamberConfig from './pages/ChamberConfig'
 import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -20,6 +21,7 @@ function App() {
               <Route path="/sites" element={<SiteSelector />} />
               <Route path="/sites/:siteId" element={<Dashboard />} />
               <Route path="/sites/:siteId/photos" element={<Photos />} />
+              <Route path="/sites/:siteId/config" element={<ChamberConfig />} />
             </Route>
           </Route>
         </Routes>

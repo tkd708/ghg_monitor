@@ -13,6 +13,7 @@ export interface Site {
   dataPath: string
   active: boolean
   treatments: Treatment[]
+  chamberConfigs?: ChamberConfig[]
   qualityThresholds: QualityThresholds
 }
 
@@ -20,6 +21,13 @@ export interface Treatment {
   name: string
   description: string
   chambers: number[]
+}
+
+export interface ChamberConfig {
+  chamber: number
+  treatment: string
+  replicate: number
+  description?: string
 }
 
 export interface QualityThresholds {

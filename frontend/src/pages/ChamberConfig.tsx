@@ -1,0 +1,322 @@
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Save, Plus, Settings, AlertCircle } from 'lucide-react'
+import { ChamberConfig, Site } from '@/types'
+import { useSite } from '@/context/SiteContext'
+
+export default function ChamberConfigPage() {
+  const { siteId } = useParams<{ siteId: string }>()
+  const { currentSite } = useSite()
+  const queryClient = useQueryClient()
+  const [configs, setConfigs] = useState<ChamberConfig[]>([])
+  const [numberOfChambers, setNumberOfChambers] = useState(16)
+  const [availableTreatments, setAvailableTreatments] = useState<string[]>([])
+
+  // Load site data to get current chamber configs
+  const { data: site, isLoading, error } = useQuery<Site>({
+    queryKey: ['site', siteId],
+    queryFn: async () => {
+      const response = await fetch(`/api/sites/${siteId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+      })
+      if (!response.ok) throw new Error('Failed to fetch site')
+      return response.json()
+    },
+    enabled: !!siteId,
+  })
+
+  // Initialize state when site data loads
+  useEffect(() => {
+    if (site) {
+      setNumberOfChambers(site.chambers)
+      
+      // Extract treatment names
+      const treatments = site.treatments.map(t => t.name)
+      setAvailableTreatments(treatments)
+      
+      // Initialize chamber configs
+      if (site.chamberConfigs && site.chamberConfigs.length > 0) {
+        setConfigs(site.chamberConfigs)
+      } else {
+        // Generate default configs from existing treatments data
+        const defaultConfigs: ChamberConfig[] = []
+        site.treatments.forEach((treatment) => {
+          treatment.chambers.forEach((chamberNum, chamberIndex) => {
+            defaultConfigs.push({
+              chamber: chamberNum,
+              treatment: treatment.name,
+              replicate: chamberIndex + 1,
+            })
+          })
+        })
+        setConfigs(defaultConfigs)
+      }
+    }
+  }, [site])
+
+  // Save chamber configuration
+  const saveMutation = useMutation({
+    mutationFn: async (configData: { chambers: number; configs: ChamberConfig[] }) => {
+      const response = await fetch(`/api/sites/${siteId}/chamber-config`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+        body: JSON.stringify(configData),
+      })
+      if (!response.ok) throw new Error('Failed to save chamber configuration')
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site', siteId] })
+    },
+  })
+
+  const handleChamberCountChange = (newCount: number) => {
+    setNumberOfChambers(newCount)
+    
+    // Adjust configs array
+    const currentConfigs = [...configs]
+    
+    if (newCount > configs.length) {
+      // Add new chambers
+      for (let i = configs.length + 1; i <= newCount; i++) {
+        currentConfigs.push({
+          chamber: i,
+          treatment: availableTreatments[0] || 'Control',
+          replicate: 1,
+        })
+      }
+    } else if (newCount < configs.length) {
+      // Remove chambers beyond the new count
+      currentConfigs.splice(newCount)
+    }
+    
+    setConfigs(currentConfigs)
+  }
+
+  const updateConfig = (index: number, field: keyof ChamberConfig, value: string | number) => {
+    const newConfigs = [...configs]
+    newConfigs[index] = { ...newConfigs[index], [field]: value }
+    setConfigs(newConfigs)
+  }
+
+  const addTreatment = () => {
+    const newTreatment = prompt('Enter treatment name:')
+    if (newTreatment && !availableTreatments.includes(newTreatment)) {
+      setAvailableTreatments([...availableTreatments, newTreatment])
+    }
+  }
+
+  const handleSave = () => {
+    saveMutation.mutate({
+      chambers: numberOfChambers,
+      configs: configs,
+    })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading chamber configuration...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-md bg-red-50 p-4">
+        <div className="flex">
+          <AlertCircle className="h-5 w-5 text-red-400" />
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">Error loading site</h3>
+            <p className="mt-1 text-sm text-red-700">{(error as Error).message}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <Settings className="w-8 h-8 mr-3 text-primary-600" />
+            Chamber Configuration
+          </h1>
+          <p className="text-gray-600">
+            Configure chamber treatments and replicates for {currentSite?.name}
+          </p>
+        </div>
+        <button
+          onClick={handleSave}
+          disabled={saveMutation.isPending}
+          className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {saveMutation.isPending ? 'Saving...' : 'Save Configuration'}
+        </button>
+      </div>
+
+      {/* Number of Chambers */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">General Settings</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Number of Chambers
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="50"
+              value={numberOfChambers}
+              onChange={(e) => handleChamberCountChange(parseInt(e.target.value) || 1)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Available Treatments
+            </label>
+            <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap gap-1">
+                {availableTreatments.map((treatment) => (
+                  <span
+                    key={treatment}
+                    className="px-2 py-1 bg-primary-100 text-primary-800 text-xs rounded"
+                  >
+                    {treatment}
+                  </span>
+                ))}
+              </div>
+              <button
+                onClick={addTreatment}
+                className="flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+              >
+                <Plus className="w-3 h-3 mr-1" />
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chamber Configuration Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Chamber Assignments</h2>
+          <p className="text-sm text-gray-600">Configure treatment and replicate for each chamber</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Chamber
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Treatment
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Replicate
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Description
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {configs.map((config, index) => (
+                <tr key={config.chamber} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="font-medium text-gray-900">
+                      Chamber {config.chamber}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <select
+                      value={config.treatment}
+                      onChange={(e) => updateConfig(index, 'treatment', e.target.value)}
+                      className="w-full px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      {availableTreatments.map((treatment) => (
+                        <option key={treatment} value={treatment}>
+                          {treatment}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="number"
+                      min="1"
+                      value={config.replicate}
+                      onChange={(e) => updateConfig(index, 'replicate', parseInt(e.target.value) || 1)}
+                      className="w-20 px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    <input
+                      type="text"
+                      value={config.description || ''}
+                      onChange={(e) => updateConfig(index, 'description', e.target.value)}
+                      placeholder="Optional description"
+                      className="w-full px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Configuration Summary</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Total Chambers</p>
+            <p className="text-2xl font-bold text-gray-900">{numberOfChambers}</p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Treatments</p>
+            <p className="text-2xl font-bold text-gray-900">{availableTreatments.length}</p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Max Replicates</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {Math.max(...configs.map(c => c.replicate), 0)}
+            </p>
+          </div>
+        </div>
+        
+        {/* Treatment breakdown */}
+        <div className="mt-4">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">Chambers per Treatment</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {availableTreatments.map((treatment) => {
+              const count = configs.filter(c => c.treatment === treatment).length
+              return (
+                <div key={treatment} className="flex justify-between text-sm">
+                  <span className="text-gray-600">{treatment}:</span>
+                  <span className="font-medium">{count} chambers</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
