@@ -83,4 +83,65 @@ router.put('/:siteId/chamber-config', authenticate, async (req, res): Promise<vo
   }
 })
 
+// Get chamber specifications for a site
+router.get('/:siteId/chamber-specs', authenticate, async (req, res): Promise<void> => {
+  try {
+    const { siteId } = req.params
+
+    // Read site registry to get chamber specs
+    const registryPath = path.join(__dirname, '../../../data/site_registry.json')
+    const registryData = await fs.readFile(registryPath, 'utf-8')
+    const registry = JSON.parse(registryData)
+    const site = registry.sites.find((s: any) => s.id === siteId)
+
+    if (!site) {
+      res.status(404).json({ error: 'Site not found' })
+      return
+    }
+
+    // Return chamber specifications if they exist
+    res.json(site.chamberSpecs || [])
+  } catch (error) {
+    logger.error('Error reading chamber specifications:', error)
+    res.status(500).json({ error: 'Failed to load chamber specifications' })
+  }
+})
+
+// Update chamber specifications for a site
+router.put('/:siteId/chamber-specs', authenticate, async (req, res): Promise<void> => {
+  try {
+    const { siteId } = req.params
+    const { chamberSpecs } = req.body
+
+    if (!chamberSpecs || typeof chamberSpecs !== 'object') {
+      res.status(400).json({ error: 'Invalid chamber specifications format' })
+      return
+    }
+
+    // Read current site registry
+    const registryPath = path.join(__dirname, '../../../data/site_registry.json')
+    const registryData = await fs.readFile(registryPath, 'utf-8')
+    const registry = JSON.parse(registryData)
+    
+    const siteIndex = registry.sites.findIndex((s: any) => s.id === siteId)
+    if (siteIndex === -1) {
+      res.status(404).json({ error: 'Site not found' })
+      return
+    }
+
+    // Update chamber specifications
+    registry.sites[siteIndex].chamberSpecs = chamberSpecs
+    registry.lastUpdated = new Date().toISOString()
+
+    // Write back to file
+    await fs.writeFile(registryPath, JSON.stringify(registry, null, 2))
+
+    logger.info(`Updated chamber specifications for site ${siteId}`)
+    res.json({ success: true, chamberSpecs })
+  } catch (error) {
+    logger.error('Error updating chamber specifications:', error)
+    res.status(500).json({ error: 'Failed to save chamber specifications' })
+  }
+})
+
 export default router

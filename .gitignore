@@ -57,6 +57,8 @@ pip-delete-this-directory.txt
 # Data files (keeping structure but not actual data)
 data/**/flux_data/
 data/**/photos/
+data/*/data/*.csv
+data/*/photos/*
 !data/site_registry.json
 !data/flux_data_test/
 

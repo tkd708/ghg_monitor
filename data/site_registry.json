@@ -1,9 +1,9 @@
 {
   "sites": [
     {
-      "id": "qut-cotton2",
-      "name": "QUT Cotton Trial 2",
-      "description": "Cotton field trial with N2O emission measurements",
+      "id": "test1",
+      "name": "Test Site 1 - QUT Cotton Trial 1",
+      "description": "Cotton field trial with N2O emission measurements - Site 1",
       "location": {
         "latitude": -27.5598,
         "longitude": 153.0813,
@@ -12,31 +12,387 @@
       },
       "timezone": "Australia/Brisbane",
       "chambers": 16,
-      "dataPath": "data/flux_data_test",
+      "dataPath": "data/test1",
       "active": true,
       "treatments": [
-        { "name": "N0", "description": "Control (0 kg N/ha)", "chambers": [1, 5, 9, 13], "nrate": 0 },
-        { "name": "N200", "description": "Standard N (200 kg N/ha)", "chambers": [3, 7, 11, 15], "nrate": 200 },
-        { "name": "eNPower", "description": "Enhanced efficiency fertilizer", "chambers": [2, 6, 10, 14], "nrate": 200 },
-        { "name": "Centuro", "description": "Nitrification inhibitor", "chambers": [4, 8, 12, 16], "nrate": 200 }
+        {
+          "name": "N0",
+          "description": "Control (0 kg N/ha)",
+          "chambers": [
+            1,
+            5,
+            9,
+            13
+          ],
+          "nrate": 0
+        },
+        {
+          "name": "N200",
+          "description": "Standard N (200 kg N/ha)",
+          "chambers": [
+            3,
+            7,
+            11,
+            15
+          ],
+          "nrate": 200
+        },
+        {
+          "name": "eNPower",
+          "description": "Enhanced efficiency fertilizer",
+          "chambers": [
+            2,
+            6,
+            10,
+            14
+          ],
+          "nrate": 200
+        },
+        {
+          "name": "Centuro",
+          "description": "Nitrification inhibitor",
+          "chambers": [
+            4,
+            8,
+            12,
+            16
+          ],
+          "nrate": 200
+        }
       ],
       "chamberConfigs": [
-        { "chamber": 1, "plot": 1, "treatment": "N0", "replicate": 1, "nrate": 0, "description": "Control plot 1" },
-        { "chamber": 2, "plot": 2, "treatment": "eNPower", "replicate": 1, "nrate": 200, "description": "Enhanced efficiency fertilizer 1" },
-        { "chamber": 3, "plot": 3, "treatment": "N200", "replicate": 1, "nrate": 200, "description": "Standard N fertilizer 1" },
-        { "chamber": 4, "plot": 4, "treatment": "Centuro", "replicate": 1, "nrate": 200, "description": "Nitrification inhibitor 1" },
-        { "chamber": 5, "plot": 5, "treatment": "N0", "replicate": 2, "nrate": 0, "description": "Control plot 2" },
-        { "chamber": 6, "plot": 6, "treatment": "eNPower", "replicate": 2, "nrate": 200, "description": "Enhanced efficiency fertilizer 2" },
-        { "chamber": 7, "plot": 7, "treatment": "N200", "replicate": 2, "nrate": 200, "description": "Standard N fertilizer 2" },
-        { "chamber": 8, "plot": 8, "treatment": "Centuro", "replicate": 2, "nrate": 200, "description": "Nitrification inhibitor 2" },
-        { "chamber": 9, "plot": 9, "treatment": "N0", "replicate": 3, "nrate": 0, "description": "Control plot 3" },
-        { "chamber": 10, "plot": 10, "treatment": "eNPower", "replicate": 3, "nrate": 200, "description": "Enhanced efficiency fertilizer 3" },
-        { "chamber": 11, "plot": 11, "treatment": "N200", "replicate": 3, "nrate": 200, "description": "Standard N fertilizer 3" },
-        { "chamber": 12, "plot": 12, "treatment": "Centuro", "replicate": 3, "nrate": 200, "description": "Nitrification inhibitor 3" },
-        { "chamber": 13, "plot": 13, "treatment": "N0", "replicate": 4, "nrate": 0, "description": "Control plot 4" },
-        { "chamber": 14, "plot": 14, "treatment": "eNPower", "replicate": 4, "nrate": 200, "description": "Enhanced efficiency fertilizer 4" },
-        { "chamber": 15, "plot": 15, "treatment": "N200", "replicate": 4, "nrate": 200, "description": "Standard N fertilizer 4" },
-        { "chamber": 16, "plot": 16, "treatment": "Centuro", "replicate": 4, "nrate": 200, "description": "Nitrification inhibizer 4" }
+        {
+          "chamber": 1,
+          "plot": 1,
+          "treatment": "N0",
+          "replicate": 1,
+          "nrate": 0,
+          "description": "Control plot 1"
+        },
+        {
+          "chamber": 2,
+          "plot": 2,
+          "treatment": "eNPower",
+          "replicate": 1,
+          "nrate": 200,
+          "description": "Enhanced efficiency fertilizer 1"
+        },
+        {
+          "chamber": 3,
+          "plot": 3,
+          "treatment": "N200",
+          "replicate": 1,
+          "nrate": 200,
+          "description": "Standard N fertilizer 1"
+        },
+        {
+          "chamber": 4,
+          "plot": 4,
+          "treatment": "Centuro",
+          "replicate": 1,
+          "nrate": 200,
+          "description": "Nitrification inhibitor 1"
+        },
+        {
+          "chamber": 5,
+          "plot": 5,
+          "treatment": "N0",
+          "replicate": 2,
+          "nrate": 0,
+          "description": "Control plot 2"
+        },
+        {
+          "chamber": 6,
+          "plot": 6,
+          "treatment": "eNPower",
+          "replicate": 2,
+          "nrate": 200,
+          "description": "Enhanced efficiency fertilizer 2"
+        },
+        {
+          "chamber": 7,
+          "plot": 7,
+          "treatment": "N200",
+          "replicate": 2,
+          "nrate": 200,
+          "description": "Standard N fertilizer 2"
+        },
+        {
+          "chamber": 8,
+          "plot": 8,
+          "treatment": "Centuro",
+          "replicate": 2,
+          "nrate": 200,
+          "description": "Nitrification inhibitor 2"
+        },
+        {
+          "chamber": 9,
+          "plot": 9,
+          "treatment": "N0",
+          "replicate": 3,
+          "nrate": 0,
+          "description": "Control plot 3"
+        },
+        {
+          "chamber": 10,
+          "plot": 10,
+          "treatment": "eNPower",
+          "replicate": 3,
+          "nrate": 200,
+          "description": "Enhanced efficiency fertilizer 3"
+        },
+        {
+          "chamber": 11,
+          "plot": 11,
+          "treatment": "N200",
+          "replicate": 3,
+          "nrate": 200,
+          "description": "Standard N fertilizer 3"
+        },
+        {
+          "chamber": 12,
+          "plot": 12,
+          "treatment": "Centuro",
+          "replicate": 3,
+          "nrate": 200,
+          "description": "Nitrification inhibitor 3"
+        },
+        {
+          "chamber": 13,
+          "plot": 13,
+          "treatment": "N0",
+          "replicate": 4,
+          "nrate": 0,
+          "description": "Control plot 4"
+        },
+        {
+          "chamber": 14,
+          "plot": 14,
+          "treatment": "eNPower",
+          "replicate": 4,
+          "nrate": 200,
+          "description": "Enhanced efficiency fertilizer 4"
+        },
+        {
+          "chamber": 15,
+          "plot": 15,
+          "treatment": "N200",
+          "replicate": 4,
+          "nrate": 200,
+          "description": "Standard N fertilizer 4"
+        },
+        {
+          "chamber": 16,
+          "plot": 16,
+          "treatment": "Centuro",
+          "replicate": 4,
+          "nrate": 200,
+          "description": "Nitrification inhibitor 4"
+        }
+      ],
+      "qualityThresholds": {
+        "co2_r2_min": 0.6,
+        "n2o_r2_min": 0.6,
+        "n2o_flux_min": -5
+      },
+      "chamberSpecs": {
+        "length_cm": 20,
+        "width_cm": 40,
+        "height_cm": 15,
+        "measurement_frequency_hz": 1,
+        "has_vent": false,
+        "has_fan": false
+      }
+    },
+    {
+      "id": "test2",
+      "name": "Test Site 2 - QUT Cotton Trial 2",
+      "description": "Cotton field trial with N2O emission measurements - Site 2",
+      "location": {
+        "latitude": -27.52,
+        "longitude": 153.05,
+        "region": "Queensland",
+        "country": "Australia"
+      },
+      "timezone": "Australia/Brisbane",
+      "chambers": 16,
+      "dataPath": "data/test2",
+      "active": true,
+      "treatments": [
+        {
+          "name": "N0",
+          "description": "Control (0 kg N/ha)",
+          "chambers": [
+            1,
+            5,
+            9,
+            13
+          ],
+          "nrate": 0
+        },
+        {
+          "name": "N200",
+          "description": "Standard N (200 kg N/ha)",
+          "chambers": [
+            3,
+            7,
+            11,
+            15
+          ],
+          "nrate": 200
+        },
+        {
+          "name": "eNPower",
+          "description": "Enhanced efficiency fertilizer",
+          "chambers": [
+            2,
+            6,
+            10,
+            14
+          ],
+          "nrate": 200
+        },
+        {
+          "name": "Centuro",
+          "description": "Nitrification inhibitor",
+          "chambers": [
+            4,
+            8,
+            12,
+            16
+          ],
+          "nrate": 200
+        }
+      ],
+      "chamberConfigs": [
+        {
+          "chamber": 1,
+          "plot": 1,
+          "treatment": "N0",
+          "replicate": 1,
+          "nrate": 0,
+          "description": "Control plot 1"
+        },
+        {
+          "chamber": 2,
+          "plot": 2,
+          "treatment": "eNPower",
+          "replicate": 1,
+          "nrate": 200,
+          "description": "Enhanced efficiency fertilizer 1"
+        },
+        {
+          "chamber": 3,
+          "plot": 3,
+          "treatment": "N200",
+          "replicate": 1,
+          "nrate": 200,
+          "description": "Standard N fertilizer 1"
+        },
+        {
+          "chamber": 4,
+          "plot": 4,
+          "treatment": "Centuro",
+          "replicate": 1,
+          "nrate": 200,
+          "description": "Nitrification inhibitor 1"
+        },
+        {
+          "chamber": 5,
+          "plot": 5,
+          "treatment": "N0",
+          "replicate": 2,
+          "nrate": 0,
+          "description": "Control plot 2"
+        },
+        {
+          "chamber": 6,
+          "plot": 6,
+          "treatment": "eNPower",
+          "replicate": 2,
+          "nrate": 200,
+          "description": "Enhanced efficiency fertilizer 2"
+        },
+        {
+          "chamber": 7,
+          "plot": 7,
+          "treatment": "N200",
+          "replicate": 2,
+          "nrate": 200,
+          "description": "Standard N fertilizer 2"
+        },
+        {
+          "chamber": 8,
+          "plot": 8,
+          "treatment": "Centuro",
+          "replicate": 2,
+          "nrate": 200,
+          "description": "Nitrification inhibitor 2"
+        },
+        {
+          "chamber": 9,
+          "plot": 9,
+          "treatment": "N0",
+          "replicate": 3,
+          "nrate": 0,
+          "description": "Control plot 3"
+        },
+        {
+          "chamber": 10,
+          "plot": 10,
+          "treatment": "eNPower",
+          "replicate": 3,
+          "nrate": 200,
+          "description": "Enhanced efficiency fertilizer 3"
+        },
+        {
+          "chamber": 11,
+          "plot": 11,
+          "treatment": "N200",
+          "replicate": 3,
+          "nrate": 200,
+          "description": "Standard N fertilizer 3"
+        },
+        {
+          "chamber": 12,
+          "plot": 12,
+          "treatment": "Centuro",
+          "replicate": 3,
+          "nrate": 200,
+          "description": "Nitrification inhibitor 3"
+        },
+        {
+          "chamber": 13,
+          "plot": 13,
+          "treatment": "N0",
+          "replicate": 4,
+          "nrate": 0,
+          "description": "Control plot 4"
+        },
+        {
+          "chamber": 14,
+          "plot": 14,
+          "treatment": "eNPower",
+          "replicate": 4,
+          "nrate": 200,
+          "description": "Enhanced efficiency fertilizer 4"
+        },
+        {
+          "chamber": 15,
+          "plot": 15,
+          "treatment": "N200",
+          "replicate": 4,
+          "nrate": 200,
+          "description": "Standard N fertilizer 4"
+        },
+        {
+          "chamber": 16,
+          "plot": 16,
+          "treatment": "Centuro",
+          "replicate": 4,
+          "nrate": 200,
+          "description": "Nitrification inhibitor 4"
+        }
       ],
       "qualityThresholds": {
         "co2_r2_min": 0.6,
@@ -46,5 +402,5 @@
     }
   ],
   "version": "1.0.0",
-  "lastUpdated": "2025-08-02T00:00:00Z"
+  "lastUpdated": "2025-08-02T16:24:18.477Z"
 }

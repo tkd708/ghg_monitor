@@ -1,22 +1,65 @@
-# GHG Monitor
+# GHG Monitor - Greenhouse Gas Monitoring System
 
-A web application for monitoring greenhouse gas (GHG) emissions from multiple field trial sites.
+A comprehensive web application for monitoring, analyzing, and visualizing greenhouse gas emissions from agricultural systems using chamber-based measurement techniques.
 
-## Features
+## 🌱 Overview
 
-- **Multi-site Support**: Monitor multiple GHG measurement locations
-- **Real-time Visualization**: Interactive charts for CO2, N2O, and H2O data
-- **Quality Control**: Automatic data filtering based on R² values
-- **Responsive Design**: Works on desktop and mobile devices
-- **Photo Documentation**: Upload and manage field visit photos
-- **Data Export**: Export processed data for further analysis
+GHG Monitor is a full-stack application designed for researchers and agricultural professionals to track CO₂, N₂O, and H₂O emissions from soil chambers. The system provides real-time data visualization, statistical analysis, and quality control assessment for greenhouse gas flux measurements.
 
-## Technology Stack
+## ✨ Features
+
+### 📊 Dashboard
+- **Real-time Overview**: Summary statistics with active chambers, total records, and site status
+- **Recent Data Preview**: Latest 10 measurements with all sensor readings
+- **Most Recent File Info**: Automatic detection of latest data files with metadata
+- **Smart Data Validation**: Filters out invalid chamber IDs and malformed data
+
+### 🔬 Analysis Tools
+
+#### (a) Individual Cycle Data
+- **Whole Measurement Cycle**: Complete time-series visualization for all chambers
+- **Per-Chamber Analysis**: Multi-chamber comparison with color-coded traces  
+- **Linear Regression**: Backend-calculated slope, R², intercept, and flux rates
+- **Time Window Control**: Adjustable analysis windows for precise calculations
+
+#### (b) Flux Quality Check
+- **R² vs Time**: Diurnal patterns of regression quality
+- **R² vs Flux Correlation**: Quality-flux relationship analysis
+- **Custom Range Controls**: User-defined flux ranges for focused analysis
+- **Quality Statistics**: Automated pass/fail assessment based on configurable thresholds
+
+#### (c) Subdaily Flux Dynamics
+- **Time-Series Analysis**: Complete date-time range visualization
+- **Treatment Statistics**: Mean ± standard error across replicates
+- **Quality Filtering**: Real-time application of R² and flux thresholds
+- **Error Bar Visualization**: Statistical uncertainty display
+
+#### (d) Daily/Cumulative Flux
+- **Advanced Processing Pipeline**: 4-step interpolation and aggregation
+- **Linear Interpolation**: Per-chamber between measurement cycles
+- **Daily Aggregation**: Treatment-level statistics with SE calculation
+- **Cumulative Analysis**: Running totals with baseline correction
+- **Quality Inheritance**: Automatic use of criteria from subdaily analysis
+
+### ⚙️ Configuration Management
+- **Site Management**: Multi-site support with individual configurations
+- **Chamber Specifications**: Customizable dimensions and measurement frequency
+- **Quality Thresholds**: Configurable R² minimums and flux criteria
+- **User Authentication**: Secure access with JWT tokens
+
+### 📈 Data Processing
+- **Automated Flux Calculations**: CO₂ (kg C/ha/d) and N₂O (g N/ha/d)
+- **Temperature/Pressure Corrections**: Molar volume adjustments
+- **Statistical Processing**: Mean, standard error, and replicate counting
+- **Data Quality Assurance**: Comprehensive validation and filtering
+
+## 🏗️ Technology Stack
 
 - **Frontend**: React 18, TypeScript, TailwindCSS, Recharts
 - **Backend**: Node.js, Express, TypeScript
-- **Data Processing**: Python (pandas, numpy)
 - **State Management**: Context API + React Query
+- **Charts**: Recharts with custom error bars and statistical overlays
+- **Authentication**: JWT tokens with secure session management
 
 ## Project Structure
 

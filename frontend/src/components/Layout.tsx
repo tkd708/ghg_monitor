@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { Menu, X, Home, Camera, LogOut, BarChart2, Settings } from 'lucide-react'
+import { Menu, X, Home, Camera, LogOut, BarChart2, Settings, TrendingUp } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useSite } from '@/context/SiteContext'
 import clsx from 'clsx'
@@ -21,6 +21,7 @@ export default function Layout() {
     { path: '/sites', label: 'Sites', icon: Home },
     ...(currentSite ? [
       { path: `/sites/${currentSite.id}`, label: 'Dashboard', icon: BarChart2 },
+      { path: `/sites/${currentSite.id}/analysis`, label: 'Analysis', icon: TrendingUp },
       { path: `/sites/${currentSite.id}/photos`, label: 'Photos', icon: Camera },
       { path: `/sites/${currentSite.id}/config`, label: 'Config', icon: Settings },
     ] : []),

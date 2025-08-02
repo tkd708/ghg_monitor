@@ -13,6 +13,14 @@ export default function ChamberConfigPage() {
   const [numberOfChambers, setNumberOfChambers] = useState(16)
   const [availableTreatments, setAvailableTreatments] = useState<string[]>([])
   const [treatmentNRates, setTreatmentNRates] = useState<Record<string, number>>({})
+  const [chamberSpecs, setChamberSpecs] = useState({
+    length_cm: 20,
+    width_cm: 40,
+    height_cm: 15,
+    measurements_per_day: 6,
+    has_vent: false,
+    has_fan: false
+  })
 
   // Load site data to get current chamber configs
   const { data: site, isLoading, error } = useQuery<Site>({
@@ -44,6 +52,18 @@ export default function ChamberConfigPage() {
         nrates[treatment.name] = treatment.nrate || 0
       })
       setTreatmentNRates(nrates)
+
+      // Load chamber specifications
+      if (site.chamberSpecs) {
+        setChamberSpecs({
+          length_cm: site.chamberSpecs.length_cm || 20,
+          width_cm: site.chamberSpecs.width_cm || 40,
+          height_cm: site.chamberSpecs.height_cm || 15,
+          measurements_per_day: site.chamberSpecs.measurements_per_day || site.chamberSpecs.measurement_frequency_hz || 6,
+          has_vent: site.chamberSpecs.has_vent || false,
+          has_fan: site.chamberSpecs.has_fan || false
+        })
+      }
       
       // Initialize chamber configs
       if (site.chamberConfigs && site.chamberConfigs.length > 0) {
@@ -69,17 +89,30 @@ export default function ChamberConfigPage() {
 
   // Save chamber configuration
   const saveMutation = useMutation({
-    mutationFn: async (configData: { chambers: number; configs: ChamberConfig[] }) => {
-      const response = await fetch(`/api/sites/${siteId}/chamber-config`, {
+    mutationFn: async (configData: { chambers: number; configs: ChamberConfig[]; chamberSpecs: any }) => {
+      // Save chamber config
+      const configResponse = await fetch(`/api/sites/${siteId}/chamber-config`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         },
-        body: JSON.stringify(configData),
+        body: JSON.stringify({ chambers: configData.chambers, configs: configData.configs }),
       })
-      if (!response.ok) throw new Error('Failed to save chamber configuration')
-      return response.json()
+      if (!configResponse.ok) throw new Error('Failed to save chamber configuration')
+
+      // Save chamber specs
+      const specsResponse = await fetch(`/api/sites/${siteId}/chamber-specs`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+        body: JSON.stringify({ chamberSpecs: configData.chamberSpecs }),
+      })
+      if (!specsResponse.ok) throw new Error('Failed to save chamber specifications')
+
+      return { config: await configResponse.json(), specs: await specsResponse.json() }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site', siteId] })
@@ -197,10 +230,24 @@ export default function ChamberConfigPage() {
     URL.revokeObjectURL(url)
   }
 
+  // Helper functions for chamber specifications
+  const updateChamberSpecs = (field: string, value: any) => {
+    setChamberSpecs(prev => ({ ...prev, [field]: value }))
+  }
+
+  const calculateVolume = () => {
+    return (chamberSpecs.length_cm * chamberSpecs.width_cm * chamberSpecs.height_cm).toLocaleString()
+  }
+
+  const calculateArea = () => {
+    return (chamberSpecs.length_cm * chamberSpecs.width_cm).toLocaleString()
+  }
+
   const handleSave = () => {
     saveMutation.mutate({
       chambers: numberOfChambers,
       configs: configs,
+      chamberSpecs: chamberSpecs,
     })
   }
 
@@ -270,45 +317,153 @@ export default function ChamberConfigPage() {
         </div>
       </div>
 
-      {/* Number of Chambers */}
+      {/* General Settings with Chamber Specifications */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">General Settings</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Number of Chambers
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="50"
-              value={numberOfChambers}
-              onChange={(e) => handleChamberCountChange(parseInt(e.target.value) || 1)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Available Treatments
-            </label>
-            <div className="flex items-center space-x-2">
-              <div className="flex flex-wrap gap-1">
-                {availableTreatments.map((treatment) => (
-                  <span
-                    key={treatment}
-                    className="px-2 py-1 bg-primary-100 text-primary-800 text-xs rounded"
-                  >
-                    {treatment} ({treatmentNRates[treatment] || 0} kg N/ha)
-                  </span>
-                ))}
+        <div className="space-y-6">
+          {/* Basic Settings */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Number of Chambers
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="50"
+                value={numberOfChambers}
+                onChange={(e) => handleChamberCountChange(parseInt(e.target.value) || 1)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Available Treatments
+              </label>
+              <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap gap-1">
+                  {availableTreatments.map((treatment) => (
+                    <span
+                      key={treatment}
+                      className="px-2 py-1 bg-primary-100 text-primary-800 text-xs rounded"
+                    >
+                      {treatment} ({treatmentNRates[treatment] || 0} kg N/ha)
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={addTreatment}
+                  className="flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Add
+                </button>
               </div>
-              <button
-                onClick={addTreatment}
-                className="flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-              >
-                <Plus className="w-3 h-3 mr-1" />
-                Add
-              </button>
+            </div>
+          </div>
+
+          {/* Chamber Specifications */}
+          <div>
+            <h3 className="text-md font-medium text-gray-800 mb-3">Chamber Specifications (Applied to All Chambers)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Length (cm)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={chamberSpecs.length_cm}
+                  onChange={(e) => updateChamberSpecs('length_cm', parseFloat(e.target.value) || 30)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Width (cm)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={chamberSpecs.width_cm}
+                  onChange={(e) => updateChamberSpecs('width_cm', parseFloat(e.target.value) || 30)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Height (cm)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={chamberSpecs.height_cm}
+                  onChange={(e) => updateChamberSpecs('height_cm', parseFloat(e.target.value) || 20)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Volume (cm³)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={calculateVolume()}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Area (cm²)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={calculateArea()}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Measurements per Day
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={chamberSpecs.measurements_per_day}
+                  onChange={(e) => updateChamberSpecs('measurements_per_day', parseInt(e.target.value) || 4)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
+              </div>
+            </div>
+            
+            {/* Features */}
+            <div className="mt-4 flex items-center space-x-6">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={chamberSpecs.has_vent}
+                  onChange={(e) => updateChamberSpecs('has_vent', e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-sm text-gray-700">Chambers have vents</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={chamberSpecs.has_fan}
+                  onChange={(e) => updateChamberSpecs('has_fan', e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-sm text-gray-700">Chambers have fans</span>
+              </label>
             </div>
           </div>
         </div>
@@ -470,6 +625,7 @@ export default function ChamberConfigPage() {
           </div>
         </div>
       </div>
+
     </div>
   )
 }

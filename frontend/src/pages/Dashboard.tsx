@@ -49,6 +49,7 @@ export default function Dashboard() {
   const totalRecords = fluxData?.totalRecords || 0
   const uniqueChambers = fluxData?.data ? 
     [...new Set(fluxData.data.map((d: any) => d.chamber))].length : 0
+  const mostRecentFile = fluxData?.mostRecentFile
 
   return (
     <div className="space-y-6">
@@ -95,6 +96,50 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Most Recent File Info */}
+      {mostRecentFile && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Most Recent Data File</h2>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Filename</p>
+                <p className="text-lg font-semibold text-gray-900">{mostRecentFile.filename}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Last Record Time</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {mostRecentFile.datetime ? new Date(mostRecentFile.datetime).toLocaleString() : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Records in File</p>
+                <p className="text-lg font-semibold text-gray-900">{mostRecentFile.recordCount?.toLocaleString() || 'N/A'}</p>
+              </div>
+              
+              {/* Status counts */}
+              {mostRecentFile.statusCounts && Object.keys(mostRecentFile.statusCounts).length > 0 && (
+                <div className="col-span-full">
+                  <p className="text-sm font-medium text-gray-500 mb-2">Status Distribution</p>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(mostRecentFile.statusCounts).map(([status, count]) => (
+                      <span
+                        key={status}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                      >
+                        Status {status}: {count}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Data Preview */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
@@ -121,10 +166,19 @@ export default function Dashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       H2O (ppm)
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Temp (°C)
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Pressure (kPa)
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {fluxData.data.slice(0, 10).map((record: any, index: number) => (
+                  {fluxData.data.slice(-10).reverse().map((record: any, index: number) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(record.datetime).toLocaleString()}
@@ -140,6 +194,21 @@ export default function Dashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {record.h2o_ppm?.toFixed(2) || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          record.status === '0' ? 'bg-green-100 text-green-800' : 
+                          record.status === '1' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {record.status || 'N/A'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {record.temp_c?.toFixed(1) || '25.0'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {record.pair_kpa?.toFixed(1) || '0.0'}
                       </td>
                     </tr>
                   ))}
