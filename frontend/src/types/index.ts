@@ -21,12 +21,15 @@ export interface Treatment {
   name: string
   description: string
   chambers: number[]
+  nrate?: number // N rate in kg/ha
 }
 
 export interface ChamberConfig {
   chamber: number
+  plot?: number // Plot number (can be different from chamber)
   treatment: string
   replicate: number
+  nrate?: number // Derived from treatment, but can be overridden
   description?: string
 }
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Save, Plus, Settings, AlertCircle } from 'lucide-react'
+import { Save, Plus, Settings, AlertCircle, Download, FileText } from 'lucide-react'
 import { ChamberConfig, Site } from '@/types'
 import { useSite } from '@/context/SiteContext'
 
@@ -12,6 +12,7 @@ export default function ChamberConfigPage() {
   const [configs, setConfigs] = useState<ChamberConfig[]>([])
   const [numberOfChambers, setNumberOfChambers] = useState(16)
   const [availableTreatments, setAvailableTreatments] = useState<string[]>([])
+  const [treatmentNRates, setTreatmentNRates] = useState<Record<string, number>>({})
 
   // Load site data to get current chamber configs
   const { data: site, isLoading, error } = useQuery<Site>({
@@ -33,9 +34,16 @@ export default function ChamberConfigPage() {
     if (site) {
       setNumberOfChambers(site.chambers)
       
-      // Extract treatment names
+      // Extract treatment names and N-rates
       const treatments = site.treatments.map(t => t.name)
       setAvailableTreatments(treatments)
+      
+      // Extract N-rates for treatments
+      const nrates: Record<string, number> = {}
+      site.treatments.forEach(treatment => {
+        nrates[treatment.name] = treatment.nrate || 0
+      })
+      setTreatmentNRates(nrates)
       
       // Initialize chamber configs
       if (site.chamberConfigs && site.chamberConfigs.length > 0) {
@@ -47,8 +55,10 @@ export default function ChamberConfigPage() {
           treatment.chambers.forEach((chamberNum, chamberIndex) => {
             defaultConfigs.push({
               chamber: chamberNum,
+              plot: chamberNum, // Default plot = chamber
               treatment: treatment.name,
               replicate: chamberIndex + 1,
+              nrate: treatment.nrate || 0,
             })
           })
         })
@@ -85,10 +95,13 @@ export default function ChamberConfigPage() {
     if (newCount > configs.length) {
       // Add new chambers
       for (let i = configs.length + 1; i <= newCount; i++) {
+        const defaultTreatment = availableTreatments[0] || 'Control'
         currentConfigs.push({
           chamber: i,
-          treatment: availableTreatments[0] || 'Control',
+          plot: i, // Default plot = chamber
+          treatment: defaultTreatment,
           replicate: 1,
+          nrate: treatmentNRates[defaultTreatment] || 0,
         })
       }
     } else if (newCount < configs.length) {
@@ -102,6 +115,25 @@ export default function ChamberConfigPage() {
   const updateConfig = (index: number, field: keyof ChamberConfig, value: string | number) => {
     const newConfigs = [...configs]
     newConfigs[index] = { ...newConfigs[index], [field]: value }
+    
+    // If treatment is changed, update nrate automatically
+    if (field === 'treatment' && typeof value === 'string') {
+      newConfigs[index].nrate = treatmentNRates[value] || 0
+    }
+    
+    setConfigs(newConfigs)
+  }
+
+  const updateTreatmentNRate = (treatment: string, nrate: number) => {
+    const newNRates = { ...treatmentNRates, [treatment]: nrate }
+    setTreatmentNRates(newNRates)
+    
+    // Update all chambers with this treatment
+    const newConfigs = configs.map(config => 
+      config.treatment === treatment 
+        ? { ...config, nrate } 
+        : config
+    )
     setConfigs(newConfigs)
   }
 
@@ -109,7 +141,60 @@ export default function ChamberConfigPage() {
     const newTreatment = prompt('Enter treatment name:')
     if (newTreatment && !availableTreatments.includes(newTreatment)) {
       setAvailableTreatments([...availableTreatments, newTreatment])
+      setTreatmentNRates({ ...treatmentNRates, [newTreatment]: 0 })
     }
+  }
+
+  // Export experimental metadata (equivalent to R's df_plot)
+  const exportExperimentalMetadata = () => {
+    const metadata = configs.map(config => ({
+      chamber: config.chamber,
+      plot: config.plot || config.chamber,
+      nrate: config.nrate || 0,
+      treatment: config.treatment,
+      rep: config.replicate,
+    }))
+    
+    const csvContent = [
+      ['chamber', 'plot', 'nrate', 'treatment', 'rep'].join(','),
+      ...metadata.map(row => [
+        row.chamber,
+        row.plot,
+        row.nrate,
+        row.treatment,
+        row.rep
+      ].join(','))
+    ].join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${siteId}_experimental_metadata.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // Export as JSON for Python processing
+  const exportAsJSON = () => {
+    const data = {
+      site_id: siteId,
+      chambers: numberOfChambers,
+      treatments: availableTreatments.map(name => ({
+        name,
+        nrate: treatmentNRates[name] || 0
+      })),
+      chamber_configs: configs
+    }
+    
+    const jsonContent = JSON.stringify(data, null, 2)
+    const blob = new Blob([jsonContent], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${siteId}_chamber_config.json`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const handleSave = () => {
@@ -157,14 +242,32 @@ export default function ChamberConfigPage() {
             Configure chamber treatments and replicates for {currentSite?.name}
           </p>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saveMutation.isPending}
-          className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          {saveMutation.isPending ? 'Saving...' : 'Save Configuration'}
-        </button>
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={exportExperimentalMetadata}
+              className="flex items-center px-3 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700"
+            >
+              <Download className="w-4 h-4 mr-1" />
+              Export CSV
+            </button>
+            <button
+              onClick={exportAsJSON}
+              className="flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+            >
+              <FileText className="w-4 h-4 mr-1" />
+              Export JSON
+            </button>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={saveMutation.isPending}
+            className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {saveMutation.isPending ? 'Saving...' : 'Save Configuration'}
+          </button>
+        </div>
       </div>
 
       {/* Number of Chambers */}
@@ -195,7 +298,7 @@ export default function ChamberConfigPage() {
                     key={treatment}
                     className="px-2 py-1 bg-primary-100 text-primary-800 text-xs rounded"
                   >
-                    {treatment}
+                    {treatment} ({treatmentNRates[treatment] || 0} kg N/ha)
                   </span>
                 ))}
               </div>
@@ -208,6 +311,29 @@ export default function ChamberConfigPage() {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Treatment N-Rate Configuration */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Treatment N-Rates</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {availableTreatments.map((treatment) => (
+            <div key={treatment} className="flex items-center space-x-2">
+              <label className="block text-sm font-medium text-gray-700 min-w-20">
+                {treatment}:
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={treatmentNRates[treatment] || 0}
+                onChange={(e) => updateTreatmentNRate(treatment, parseInt(e.target.value) || 0)}
+                className="flex-1 px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <span className="text-sm text-gray-500">kg N/ha</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -225,7 +351,13 @@ export default function ChamberConfigPage() {
                   Chamber
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Plot
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Treatment
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  N-Rate
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Replicate
@@ -240,8 +372,17 @@ export default function ChamberConfigPage() {
                 <tr key={config.chamber} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="font-medium text-gray-900">
-                      Chamber {config.chamber}
+                      {config.chamber}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="number"
+                      min="1"
+                      value={config.plot || config.chamber}
+                      onChange={(e) => updateConfig(index, 'plot', parseInt(e.target.value) || config.chamber)}
+                      className="w-20 px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
@@ -257,12 +398,24 @@ export default function ChamberConfigPage() {
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center space-x-1">
+                      <input
+                        type="number"
+                        min="0"
+                        value={config.nrate || 0}
+                        onChange={(e) => updateConfig(index, 'nrate', parseInt(e.target.value) || 0)}
+                        className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      />
+                      <span className="text-xs text-gray-500">kg/ha</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="number"
                       min="1"
                       value={config.replicate}
                       onChange={(e) => updateConfig(index, 'replicate', parseInt(e.target.value) || 1)}
-                      className="w-20 px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-16 px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </td>
                   <td className="px-6 py-4">
