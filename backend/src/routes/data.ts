@@ -51,15 +51,25 @@ router.get('/:siteId/data', authenticate, async (req, res): Promise<void> => {
 
         // Process each record
         for (const record of records) {
-          // Skip records with invalid chamber IDs
-          const chamberIdRaw = record['chamber id']
+          // Skip records with invalid chamber IDs - handle both column formats
+          const chamberIdRaw = record['chamber id'] || record['chamber']
           if (!chamberIdRaw || chamberIdRaw === '' || chamberIdRaw.toLowerCase() === 'na' || chamberIdRaw.toLowerCase() === 'n/a') {
             continue
           }
           
-          const chamberId = parseInt(chamberIdRaw)
+          let chamberId = parseInt(String(chamberIdRaw))
           if (isNaN(chamberId) || chamberId <= 0) {
             continue
+          }
+          
+          // Handle 4-digit chamber IDs (like 1021) by mapping to logical chamber numbers
+          // For Cortiva data: 1021-1028 -> 1-8, 1031-1038 -> 9-16
+          if (chamberId >= 1000) {
+            if (chamberId >= 1021 && chamberId <= 1028) {
+              chamberId = chamberId - 1020 // 1021 -> 1, 1022 -> 2, ..., 1028 -> 8
+            } else if (chamberId >= 1031 && chamberId <= 1038) {
+              chamberId = chamberId - 1031 + 9 // 1031 -> 9, 1032 -> 10, ..., 1038 -> 16
+            }
           }
 
           // Handle DD/MM/YYYY date format
@@ -70,7 +80,7 @@ router.get('/:siteId/data', authenticate, async (req, res): Promise<void> => {
           // Apply filters
           if (startDate && datetime < new Date(startDate as string)) continue
           if (endDate && datetime > new Date(endDate as string)) continue
-          if (chamber && chamberIdRaw !== chamber) continue
+          if (chamber && String(chamberIdRaw) !== chamber) continue
 
           // Add processed data
           allData.push({
@@ -78,8 +88,8 @@ router.get('/:siteId/data', authenticate, async (req, res): Promise<void> => {
             chamber: chamberId,
             chamber_label: `C${String(chamberId).padStart(2, '0')}`,
             co2_ppm: parseFloat(record['co2[ppm]']) || 0,
-            n2o_ppb: parseFloat(record['n2o avg [ppb]']) || 0,
-            n2o_ppm: (parseFloat(record['n2o avg [ppb]']) || 0) / 1000,
+            n2o_ppb: parseFloat(record['n2o avg [ppb]'] || record['n2o avg [ppm]']) || 0,
+            n2o_ppm: (parseFloat(record['n2o avg [ppb]'] || record['n2o avg [ppm]']) || 0) / 1000,
             h2o_ppm: parseFloat(record['h2o avg[ppm]']) || 0,
             status: record.status || '0',
             pair_kpa: parseFloat(record['pair[kpa]']) || 0,
@@ -294,9 +304,21 @@ router.get('/:siteId/raw-data', authenticate, async (req, res): Promise<void> =>
       
       return {
         datetime: new Date(`${isoDate} ${record.time}`).toISOString(),
-        chamber: parseInt(record['chamber id']) || 0,
+        chamber: (() => {
+          let chamberId = parseInt(record['chamber id'] || record['chamber']) || 0
+          // Handle 4-digit chamber IDs (like 1021) by mapping to logical chamber numbers
+          if (chamberId >= 1000) {
+            if (chamberId >= 1021 && chamberId <= 1028) {
+              chamberId = chamberId - 1020 // 1021 -> 1, 1022 -> 2, ..., 1028 -> 8
+            } else if (chamberId >= 1031 && chamberId <= 1038) {
+              chamberId = chamberId - 1031 + 9 // 1031 -> 9, 1032 -> 10, ..., 1038 -> 16
+            }
+          }
+          return chamberId
+        })(),
         co2_ppm: parseFloat(record['co2[ppm]']) || 0,
-        n2o_ppb: parseFloat(record['n2o avg [ppb]']) || 0,
+        n2o_ppb: parseFloat(record['n2o avg [ppb]'] || record['n2o avg [ppm]']) || 0,
+        n2o_ppm: (parseFloat(record['n2o avg [ppb]'] || record['n2o avg [ppm]']) || 0) / 1000,
         h2o_ppm: parseFloat(record['h2o avg[ppm]']) || 0,
         status: record.status || '0',
       }
@@ -1130,8 +1152,8 @@ router.get('/:siteId/linear-regression', authenticate, async (req, res): Promise
 
     // Get chamber specifications for accurate flux calculation
     let chamberHeight = 15 // default 15cm
-    if (site.chamberSpecs && site.chamberSpecs.height_cm) {
-      chamberHeight = site.chamberSpecs.height_cm
+    if (site.chamberSpecs && site.chamberSpecs.height) {
+      chamberHeight = site.chamberSpecs.height
     }
     
     // Convert slope to flux if needed

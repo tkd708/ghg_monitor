@@ -196,12 +196,12 @@
         "n2o_flux_min": -5
       },
       "chamberSpecs": {
-        "length_cm": 20,
-        "width_cm": 40,
-        "height_cm": 15,
-        "measurement_frequency_hz": 1,
-        "has_vent": false,
-        "has_fan": false
+        "length": 20,
+        "width": 40,
+        "height": 15,
+        "measPerDay": 6,
+        "hasVent": false,
+        "hasFan": false
       }
     },
     {
@@ -398,6 +398,186 @@
         "co2_r2_min": 0.6,
         "n2o_r2_min": 0.6,
         "n2o_flux_min": -5
+      },
+      "chamberSpecs": {
+        "length": 20,
+        "width": 40,
+        "height": 15,
+        "measPerDay": 6,
+        "hasVent": false,
+        "hasFan": false
+      }
+    },
+    {
+      "id": "cortiva",
+      "name": "Cortiva N2O Trial Site",
+      "description": "N2O emission measurements from Cortiva field trial",
+      "location": {
+        "latitude": -27.48,
+        "longitude": 153.03,
+        "region": "Queensland", 
+        "country": "Australia"
+      },
+      "timezone": "Australia/Brisbane",
+      "chambers": 16,
+      "dataPath": "data/cortiva",
+      "active": true,
+      "treatments": [
+        {
+          "name": "Control",
+          "description": "Control treatment",
+          "chambers": [1, 3, 5, 7, 9, 11, 13, 15],
+          "nrate": 0
+        },
+        {
+          "name": "Treatment",
+          "description": "Fertilizer treatment", 
+          "chambers": [2, 4, 6, 8, 10, 12, 14, 16],
+          "nrate": 200
+        }
+      ],
+      "chamberConfigs": [
+        {
+          "chamber": 1,
+          "plot": 1,
+          "treatment": "Control",
+          "replicate": 1,
+          "nrate": 0,
+          "description": "Control replicate 1"
+        },
+        {
+          "chamber": 2,
+          "plot": 2,
+          "treatment": "Treatment",
+          "replicate": 1,
+          "nrate": 200,
+          "description": "Treatment replicate 1"
+        },
+        {
+          "chamber": 3,
+          "plot": 3,
+          "treatment": "Control",
+          "replicate": 2,
+          "nrate": 0,
+          "description": "Control replicate 2"
+        },
+        {
+          "chamber": 4,
+          "plot": 4,
+          "treatment": "Treatment",
+          "replicate": 2,
+          "nrate": 200,
+          "description": "Treatment replicate 2"
+        },
+        {
+          "chamber": 5,
+          "plot": 5,
+          "treatment": "Control",
+          "replicate": 3,
+          "nrate": 0,
+          "description": "Control replicate 3"
+        },
+        {
+          "chamber": 6,
+          "plot": 6,
+          "treatment": "Treatment",
+          "replicate": 3,
+          "nrate": 200,
+          "description": "Treatment replicate 3"
+        },
+        {
+          "chamber": 7,
+          "plot": 7,
+          "treatment": "Control",
+          "replicate": 4,
+          "nrate": 0,
+          "description": "Control replicate 4"
+        },
+        {
+          "chamber": 8,
+          "plot": 8,
+          "treatment": "Treatment",
+          "replicate": 4,
+          "nrate": 200,
+          "description": "Treatment replicate 4"
+        },
+        {
+          "chamber": 9,
+          "plot": 9,
+          "treatment": "Control",
+          "replicate": 5,
+          "nrate": 0,
+          "description": "Control replicate 5"
+        },
+        {
+          "chamber": 10,
+          "plot": 10,
+          "treatment": "Treatment",
+          "replicate": 5,
+          "nrate": 200,
+          "description": "Treatment replicate 5"
+        },
+        {
+          "chamber": 11,
+          "plot": 11,
+          "treatment": "Control",
+          "replicate": 6,
+          "nrate": 0,
+          "description": "Control replicate 6"
+        },
+        {
+          "chamber": 12,
+          "plot": 12,
+          "treatment": "Treatment",
+          "replicate": 6,
+          "nrate": 200,
+          "description": "Treatment replicate 6"
+        },
+        {
+          "chamber": 13,
+          "plot": 13,
+          "treatment": "Control",
+          "replicate": 7,
+          "nrate": 0,
+          "description": "Control replicate 7"
+        },
+        {
+          "chamber": 14,
+          "plot": 14,
+          "treatment": "Treatment",
+          "replicate": 7,
+          "nrate": 200,
+          "description": "Treatment replicate 7"
+        },
+        {
+          "chamber": 15,
+          "plot": 15,
+          "treatment": "Control",
+          "replicate": 8,
+          "nrate": 0,
+          "description": "Control replicate 8"
+        },
+        {
+          "chamber": 16,
+          "plot": 16,
+          "treatment": "Treatment",
+          "replicate": 8,
+          "nrate": 200,
+          "description": "Treatment replicate 8"
+        }
+      ],
+      "qualityThresholds": {
+        "co2_r2_min": 0.6,
+        "n2o_r2_min": 0.6,
+        "n2o_flux_min": -5
+      },
+      "chamberSpecs": {
+        "length": 20,
+        "width": 40,
+        "height": 15,
+        "measPerDay": 6,
+        "hasVent": false,
+        "hasFan": false
       }
     }
   ],
