@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Settings, AlertTriangle, BarChart3 } from 'lucide-react'
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { Site } from '@/types'
-import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface FluxCalculation {
   datetime: string

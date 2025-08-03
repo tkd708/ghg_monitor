@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Calendar, Settings, BarChart3, TrendingUp } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ErrorBar } from 'recharts'
 import { Site } from '@/types'
-import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface QualityControlCriteria {
   co2_r2_min: number
@@ -39,7 +38,7 @@ interface DailyCumulativeApiResponse {
   metadata: {
     total_interpolated_points: number
     daily_chamber_points: number
-    measurements_per_day: number
+    measPerDay: number
     date_range: { startDate: string; endDate: string }
   }
 }
@@ -238,7 +237,7 @@ export default function DailyCumulativeFlux({ siteId, site, qualityCriteria: inh
           <div className="text-sm text-blue-800 space-y-1">
             <p>
               <Calendar className="inline w-4 h-4 mr-1" />
-              <strong>Step 1:</strong> Linear interpolation per chamber between measurement cycles (run IDs) at {site?.chamberSpecs?.measurements_per_day || 6} points/day
+              <strong>Step 1:</strong> Linear interpolation per chamber between measurement cycles (run IDs) at {site?.chamberSpecs?.measPerDay || 6} points/day
             </p>
             <p>
               <strong>Step 2:</strong> Daily flux per chamber by averaging across interpolated measurement cycles
@@ -416,7 +415,7 @@ export default function DailyCumulativeFlux({ siteId, site, qualityCriteria: inh
             <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-600">
               <p>Processed {fluxData.metadata.total_interpolated_points} interpolated data points</p>
               <p>Generated {fluxData.metadata.daily_chamber_points} daily chamber measurements</p>
-              <p>Interpolation rate: {fluxData.metadata.measurements_per_day} measurements per day</p>
+              <p>Interpolation rate: {fluxData.metadata.measPerDay} measurements per day</p>
             </div>
           )}
         </div>

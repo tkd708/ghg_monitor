@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { FileText, AlertCircle, TrendingUp, BarChart3, Calculator } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, ReferenceLine, Cell } from 'recharts'
 import { Site } from '@/types'
-import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface DataFile {
   filename: string
@@ -36,17 +35,6 @@ interface ChamberData {
   end_time: string
 }
 
-interface RegressionResult {
-  slope: number
-  intercept: number
-  r_squared: number
-  equation: string
-  data_points: Array<{
-    time_elapsed: number
-    concentration: number
-    included: boolean
-  }>
-}
 
 interface IndividualFluxViewerProps {
   siteId: string
@@ -623,7 +611,7 @@ export default function IndividualFluxViewer({ siteId }: IndividualFluxViewerPro
                           />
                           <Tooltip 
                             labelFormatter={(value) => `Time: ${value}s`}
-                            formatter={(value: number, name, props: any) => [
+                            formatter={(value: number, _name, props: any) => [
                               `${value?.toFixed(2) || 'N/A'} ${currentGas.unit}`,
                               `Chamber ${props.payload?.chamber || 'Unknown'}`
                             ]}

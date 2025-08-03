@@ -8,7 +8,6 @@ import IndividualFluxViewer from '@/components/IndividualFluxViewer'
 import FluxQualityCheck from '@/components/FluxQualityCheck'
 import SubdailyFluxDynamics from '@/components/SubdailyFluxDynamics'
 import DailyCumulativeFlux from '@/components/DailyCumulativeFlux'
-import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface QualityControlCriteria {
   co2_r2_min: number
@@ -24,7 +23,7 @@ export default function Analysis() {
   const [activeTab, setActiveTab] = useState<'individual' | 'quality' | 'subdaily' | 'daily'>('individual')
   
   // Shared quality control criteria state between sections (c) and (d)
-  const [sharedQualityCriteria, setSharedQualityCriteria] = useState<QualityControlCriteria | null>(null)
+  const [sharedQualityCriteria, setSharedQualityCriteria] = useState<QualityControlCriteria | undefined>(undefined)
 
   // Load site data for configuration
   const { data: site } = useQuery<Site>({

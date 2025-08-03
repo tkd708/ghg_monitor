@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Save, Plus, Settings, AlertCircle, Download, FileText } from 'lucide-react'
 import { ChamberConfig, Site } from '@/types'
 import { useSite } from '@/context/SiteContext'
-import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 export default function ChamberConfigPage() {
   const { siteId } = useParams<{ siteId: string }>()
@@ -15,12 +14,12 @@ export default function ChamberConfigPage() {
   const [availableTreatments, setAvailableTreatments] = useState<string[]>([])
   const [treatmentNRates, setTreatmentNRates] = useState<Record<string, number>>({})
   const [chamberSpecs, setChamberSpecs] = useState({
-    length_cm: 20,
-    width_cm: 40,
-    height_cm: 15,
-    measurements_per_day: 6,
-    has_vent: false,
-    has_fan: false
+    length: 20,
+    width: 40,
+    height: 15,
+    measPerDay: 6,
+    hasVent: false,
+    hasFan: false
   })
 
   // Load site data to get current chamber configs
@@ -57,12 +56,12 @@ export default function ChamberConfigPage() {
       // Load chamber specifications
       if (site.chamberSpecs) {
         setChamberSpecs({
-          length_cm: site.chamberSpecs.length_cm || 20,
-          width_cm: site.chamberSpecs.width_cm || 40,
-          height_cm: site.chamberSpecs.height_cm || 15,
-          measurements_per_day: site.chamberSpecs.measurements_per_day || site.chamberSpecs.measurement_frequency_hz || 6,
-          has_vent: site.chamberSpecs.has_vent || false,
-          has_fan: site.chamberSpecs.has_fan || false
+          length: site.chamberSpecs.length || 20,
+          width: site.chamberSpecs.width || 40,
+          height: site.chamberSpecs.height || 15,
+          measPerDay: site.chamberSpecs.measPerDay || site.chamberSpecs.measPerDay || 6,
+          hasVent: site.chamberSpecs.hasVent || false,
+          hasFan: site.chamberSpecs.hasFan || false
         })
       }
       
@@ -237,11 +236,11 @@ export default function ChamberConfigPage() {
   }
 
   const calculateVolume = () => {
-    return (chamberSpecs.length_cm * chamberSpecs.width_cm * chamberSpecs.height_cm).toLocaleString()
+    return (chamberSpecs.length * chamberSpecs.width * chamberSpecs.height).toLocaleString()
   }
 
   const calculateArea = () => {
-    return (chamberSpecs.length_cm * chamberSpecs.width_cm).toLocaleString()
+    return (chamberSpecs.length * chamberSpecs.width).toLocaleString()
   }
 
   const handleSave = () => {
@@ -375,8 +374,8 @@ export default function ChamberConfigPage() {
                   type="number"
                   min="0"
                   step="0.1"
-                  value={chamberSpecs.length_cm}
-                  onChange={(e) => updateChamberSpecs('length_cm', parseFloat(e.target.value) || 30)}
+                  value={chamberSpecs.length}
+                  onChange={(e) => updateChamberSpecs('length', parseFloat(e.target.value) || 30)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
@@ -388,8 +387,8 @@ export default function ChamberConfigPage() {
                   type="number"
                   min="0"
                   step="0.1"
-                  value={chamberSpecs.width_cm}
-                  onChange={(e) => updateChamberSpecs('width_cm', parseFloat(e.target.value) || 30)}
+                  value={chamberSpecs.width}
+                  onChange={(e) => updateChamberSpecs('width', parseFloat(e.target.value) || 30)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
@@ -401,8 +400,8 @@ export default function ChamberConfigPage() {
                   type="number"
                   min="0"
                   step="0.1"
-                  value={chamberSpecs.height_cm}
-                  onChange={(e) => updateChamberSpecs('height_cm', parseFloat(e.target.value) || 20)}
+                  value={chamberSpecs.height}
+                  onChange={(e) => updateChamberSpecs('height', parseFloat(e.target.value) || 20)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
@@ -438,8 +437,8 @@ export default function ChamberConfigPage() {
                   type="number"
                   min="1"
                   step="1"
-                  value={chamberSpecs.measurements_per_day}
-                  onChange={(e) => updateChamberSpecs('measurements_per_day', parseInt(e.target.value) || 4)}
+                  value={chamberSpecs.measPerDay}
+                  onChange={(e) => updateChamberSpecs('measPerDay', parseInt(e.target.value) || 4)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
@@ -450,8 +449,8 @@ export default function ChamberConfigPage() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={chamberSpecs.has_vent}
-                  onChange={(e) => updateChamberSpecs('has_vent', e.target.checked)}
+                  checked={chamberSpecs.hasVent}
+                  onChange={(e) => updateChamberSpecs('hasVent', e.target.checked)}
                   className="mr-2"
                 />
                 <span className="text-sm text-gray-700">Chambers have vents</span>
@@ -459,8 +458,8 @@ export default function ChamberConfigPage() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={chamberSpecs.has_fan}
-                  onChange={(e) => updateChamberSpecs('has_fan', e.target.checked)}
+                  checked={chamberSpecs.hasFan}
+                  onChange={(e) => updateChamberSpecs('hasFan', e.target.checked)}
                   className="mr-2"
                 />
                 <span className="text-sm text-gray-700">Chambers have fans</span>

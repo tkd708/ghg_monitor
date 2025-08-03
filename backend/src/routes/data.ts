@@ -98,11 +98,11 @@ router.get('/:siteId/data', authenticate, async (req, res): Promise<void> => {
     allData.sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())
 
     // Find most recent file and its metadata
-    let mostRecentFile = null
-    let mostRecentRecord = null
-    let avgTemp = null
-    let avgPressure = null
-    let statusCounts = {}
+    let mostRecentFile: string | null = null
+    let mostRecentRecord: any = null
+    let avgTemp: number | null = null
+    let avgPressure: number | null = null
+    let statusCounts: Record<string, number> = {}
 
     if (allData.length > 0) {
       mostRecentRecord = allData[allData.length - 1]

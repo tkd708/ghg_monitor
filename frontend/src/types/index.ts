@@ -15,6 +15,16 @@ export interface Site {
   treatments: Treatment[]
   chamberConfigs?: ChamberConfig[]
   qualityThresholds: QualityThresholds
+  chamberSpecs?: {
+    length: number
+    width: number
+    height: number
+    volume?: number
+    area?: number
+    measPerDay: number
+    hasVent: boolean
+    hasFan: boolean
+  }
 }
 
 export interface Treatment {

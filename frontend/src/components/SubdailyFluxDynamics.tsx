@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Clock, Settings, BarChart3 } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ErrorBar } from 'recharts'
 import { Site } from '@/types'
-import { buildApiUrl, getAuthHeaders } from '@/config/api'
 
 interface QualityControlCriteria {
   co2_r2_min: number
@@ -48,17 +47,6 @@ interface SubdailyFluxDynamicsProps {
   siteId: string
   site?: Site
   onQualityCriteriaChange?: (criteria: QualityControlCriteria) => void
-}
-
-// Helper function to get chamber color
-const getChamberColor = (chamber: number) => {
-  const colors = [
-    '#e74c3c', '#3498db', '#2ecc71', '#f39c12',
-    '#9b59b6', '#1abc9c', '#34495e', '#e67e22',
-    '#8e44ad', '#16a085', '#27ae60', '#2980b9',
-    '#c0392b', '#d35400', '#7f8c8d', '#2c3e50'
-  ]
-  return colors[(chamber - 1) % colors.length]
 }
 
 // Helper function to get treatment color
@@ -196,7 +184,6 @@ export default function SubdailyFluxDynamics({ siteId, site, onQualityCriteriaCh
   }, {} as Record<string, TreatmentTimePoint[]>)
 
   // Get unique data for UI
-  const uniqueChambers = fluxData ? [...new Set(fluxData.map(d => d.chamber))].sort((a, b) => a - b) : []
   const uniqueTreatments = Object.keys(treatmentStatGroups)
 
   // Create combined dataset with all treatments at each timestamp for proper alignment

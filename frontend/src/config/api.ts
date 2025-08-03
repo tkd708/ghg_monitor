@@ -1,9 +1,10 @@
 // API Configuration for GHG Monitor Frontend
 
 const getApiBaseUrl = (): string => {
-  // In production, use the environment variable
+  // In production with Railway, frontend and backend are on same domain
   if (import.meta.env.PROD) {
-    return import.meta.env.VITE_API_URL || 'https://ghg-monitor-backend.railway.app'
+    // Use relative URLs in production (same domain)
+    return ''
   }
   
   // In development, use localhost
@@ -14,9 +15,16 @@ export const API_BASE_URL = getApiBaseUrl()
 
 // Helper function to build full API URLs
 export const buildApiUrl = (endpoint: string): string => {
-  // Remove leading slash if present to avoid double slashes
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint
-  return `${API_BASE_URL}/${cleanEndpoint}`
+  // Ensure endpoint starts with /
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+  
+  // If no base URL (production), return just the endpoint
+  if (!API_BASE_URL) {
+    return cleanEndpoint
+  }
+  
+  // Otherwise, combine base URL and endpoint
+  return `${API_BASE_URL}${cleanEndpoint}`
 }
 
 // API client configuration

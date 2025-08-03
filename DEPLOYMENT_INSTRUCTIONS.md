@@ -1,6 +1,8 @@
 # GHG Monitor - Deployment Instructions
 
-This guide walks you through deploying the GHG Monitor application to production using Vercel (frontend) and Railway (backend).
+This guide walks you through deploying the GHG Monitor application to production using Railway (single deployment for both frontend and backend).
+
+> **Note**: For the original Vercel + Railway deployment strategy, see the git history. This document now focuses on the simpler Railway-only deployment.
 
 ## 🚀 Quick Deployment
 
