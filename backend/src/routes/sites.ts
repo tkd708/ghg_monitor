@@ -144,4 +144,46 @@ router.put('/:siteId/chamber-specs', authenticate, async (req, res): Promise<voi
   }
 })
 
+// Update site information (name and description)
+router.put('/:siteId', authenticate, async (req, res): Promise<void> => {
+  try {
+    const { siteId } = req.params
+    const { name, description } = req.body
+
+    if (!name || !description) {
+      res.status(400).json({ error: 'Name and description are required' })
+      return
+    }
+
+    // Read current site registry
+    const registryPath = path.join(__dirname, '../../../data/site_registry.json')
+    const data = await fs.readFile(registryPath, 'utf-8')
+    const registry = JSON.parse(data)
+    
+    // Find the site to update
+    const siteIndex = registry.sites.findIndex((s: any) => s.id === siteId)
+    if (siteIndex === -1) {
+      res.status(404).json({ error: 'Site not found' })
+      return
+    }
+
+    // Update the site information
+    registry.sites[siteIndex].name = name.trim()
+    registry.sites[siteIndex].description = description.trim()
+    registry.lastUpdated = new Date().toISOString()
+
+    // Write updated registry back to file
+    await fs.writeFile(registryPath, JSON.stringify(registry, null, 2))
+
+    logger.info(`Updated site information for site ${siteId}`)
+    res.json({ 
+      message: 'Site information updated successfully',
+      site: registry.sites[siteIndex]
+    })
+  } catch (error) {
+    logger.error('Error updating site information:', error)
+    res.status(500).json({ error: 'Failed to update site information' })
+  }
+})
+
 export default router

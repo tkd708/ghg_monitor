@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { AlertCircle, BarChart3, TrendingUp, Activity } from 'lucide-react'
 import { useSite } from '@/context/SiteContext'
 import { buildApiUrl, getAuthHeaders } from '@/config/api'
+import SiteInfoEditor from '@/components/SiteInfoEditor'
 
 export default function Dashboard() {
   const { siteId } = useParams<{ siteId: string }>()
@@ -52,14 +53,16 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header with Editable Site Info */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {currentSite?.name || 'Site Dashboard'}
-        </h1>
-        <p className="text-gray-600">
-          {currentSite?.description}
-        </p>
+        {currentSite && siteId ? (
+          <SiteInfoEditor site={currentSite} siteId={siteId} />
+        ) : (
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Site Dashboard</h1>
+            <p className="text-gray-600">Loading site information...</p>
+          </div>
+        )}
       </div>
 
       {/* Stats Cards */}
